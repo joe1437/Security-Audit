@@ -1,22 +1,21 @@
-<h1>JWipe - Disk Sanitization</h1>
-
- ### [YouTube Demonstration](https://youtu.be/7eJexJVCqJo)
+<h1>Azure Sentinel (SIEM) Project</h1>
 
 <h2>Description</h2>
-Project consists of a simple PowerShell script that walks the user through "zeroing out" (wiping) any drives that are connected to the system. The utility allows you to select the target disk and choose the number of passes that are performed. The PowerShell script will configure a diskpart script file based on the user's selections and then launch Diskpart to perform the disk sanitization.
+This project consists of setting up Microsoft Sentinel (cloud-based SIEM), as well as a virtual machine acting as a honeypot, to monitor and log IP addresses and locations of the attacks (failed RDP logs) happening worldwide on the virtual machine, and then display the data on a map. 
 <br />
 
+<h2>Summary </h2>
 
-<h2>Languages and Utilities Used</h2>
+- <b>- Extracted and forwarded metdata from Windows Event Viewer to third party API using custom PowerShell script, to derive geolocation data.
 
-- <b>PowerShell</b> 
-- <b>Diskpart</b>
+- <b>- Configured Log Analytics Workspace in Azure to ingest custom logs containing geographic data (latitude, longitude, state/province, and country.
 
-<h2>Environments Used </h2>
+- <b>- Configured custom fields in Log Analytics Workspace to map geo data in Microsoft Sentinel.
 
-- <b>Windows 10</b> (21H2)
+- <b>- Configured Microsoft Sentinel workbook to display the RDP brute force attacks data on world map according to physical location and number of attacks.
 
-<h2>Program walk-through:</h2>
+
+<h2>Project walk-through:</h2>
 
 <p align="center">
 Launch the utility: <br/>
