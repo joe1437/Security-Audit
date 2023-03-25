@@ -1,4 +1,4 @@
-<h1>Azure Sentinel (SIEM) Project</h1>
+<h1>Microsoft Sentinel (Azure SIEM) Project</h1>
 
 <h2>Description</h2>
 This project consists of setting up Microsoft Sentinel (cloud-based SIEM), as well as a virtual machine acting as a honeypot, to monitor and log IP addresses and locations of the attacks (failed RDP logs) happening worldwide on the virtual machine, and then display the data on a map. 
