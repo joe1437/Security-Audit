@@ -12,7 +12,7 @@ This project consists of setting up Microsoft Sentinel (cloud-based SIEM), as we
 
 - <b>- Configured custom fields in Log Analytics Workspace to map geo data in Microsoft Sentinel.
 
-- <b>- Configured Microsoft Sentinel workbook to display the RDP brute force attacks data on world map according to physical location and number of attacks.
+- <b>- Configured Microsoft Sentinel workbook to display the RDP brute force attacks data on a world map according to the physical location and the number of attacks.
 
 
 <h2>Project walk-through:</h2>
