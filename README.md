@@ -6,7 +6,7 @@ This project consists of setting up Microsoft Sentinel (cloud-based SIEM), as we
 
 <h2>Summary </h2>
 
-- <b>- Extracted and forwarded metadata from Windows Event Viewer to a third party API using custom PowerShell script, to derive geolocation data.
+- <b>- Extracted and forwarded metadata from Windows Event Viewer to a third party API using a custom PowerShell script, to derive geolocation data.
 
 - <b>- Configured Log Analytics Workspace in Azure to ingest custom logs containing geographic data (latitude, longitude, state/province, and country.
 
