@@ -1,298 +1,75 @@
-<h1>Microsoft Sentinel (Azure SIEM) Project</h1>
+<h1>Conducting a security audit</h1>
 
 <h2>Description</h2>
-This project consists of setting up Microsoft Sentinel (cloud-based SIEM), as well as a virtual machine acting as a honeypot, to monitor and log IP addresses and locations of the attacks (failed RDP logs) happening worldwide on the virtual machine, and then display the data on a map. 
+For this project, I will be conducting a security audit for a fictional company called Botium Toys
 <br />
 
-<h2>Summary </h2>
+<h2>Scenario </h2>
 
-- <b>- Extracted and forwarded metadata from Windows Event Viewer to a third party API using a custom PowerShell script, to derive geolocation data.
+- Botium Toys is a small U.S. business that develops and sells toys. The business has a single physical location. However, its online presence has grown, attracting customers    in the U.S. and abroad. Their information technology (IT) department is under increasing pressure to support their online market worldwide. 
 
-- <b>- Configured Log Analytics Workspace in Azure to ingest custom logs containing geographic data (latitude, longitude, state/province, and country.
+- The manager of the IT department has decided that an internal IT audit needs to be conducted. She expresses concerns about not having a solidified plan of action to ensure  business continuity and compliance, as the business grows. She believes an internal audit can help better secure the company’s infrastructure and help them identify and mitigate potential risks, threats, or vulnerabilities to critical assets. The manager is also interested in ensuring that they comply with regulations related to accepting online payments and conducting business in the European Union (E.U.).   
 
-- <b>- Configured custom fields in Log Analytics Workspace to map geo data in Microsoft Sentinel.
-
-- <b>- Configured Microsoft Sentinel workbook to display the RDP brute force attacks data on a world map according to the physical location and the number of attacks.
-
-
-<h2>Project walk-through:</h2>
+- The IT manager starts by implementing the National Institute of Standards and Technology Cybersecurity Framework (NIST CSF), establishing an audit scope and goals, and completing a risk assessment. The goal of the audit is to provide an overview of the risks the company might experience due to the current state of their security posture. The IT manager wants to use the audit findings as evidence to obtain approval to expand his department. 
 
 <p>
- <h3> Create a Virtual Machine that will be attacked </h3>
-1. In Azure, search and go to the Virtual Machines page <br/>
- <img src="https://imgur.com/z2ns25d.png" height="80%" width="80%" alt="1"/>
-<br />
-<br />
-2. Click on Create > Azure virtual machine <br/>
-  <img src="https://imgur.com/ajDeLHM.png" height="80%" width="80%" alt="2"/>
-<br />
-<br />
-3. Create a new resource group <br/>
-  <img src="https://imgur.com/0i8agnY.png" height="80%" width="80%" alt="3"/>
-<br />
-<br />
-4. Name the virtual machine, choose a region, and choose an image <br/>
-  <img src="https://imgur.com/RW1zOTB.png" height="80%" width="80%" alt="4"/>
-<br />
-<br />
-5. Create an administrator account <br/>
-  <img src="https://imgur.com/tqPEXgc.png" height="80%" width="80%" alt="5"/>
-<br />
-<br />
-6. Check the Licensing box, and click Next <br/>
-  <img src="https://imgur.com/Q5r9w03.png" height="80%" width="80%" alt="6"/>
-<br />
-<br />
-7. Click Next to go to Networking <br/>
-  <img src="https://imgur.com/43KGhVy.png" height="80%" width="80%" alt="7"/>
-<br />
-<br />
-8. Pick Advanced in NIC network security group, and click Create new <br/>
-  <img src="https://imgur.com/l9tGsV3.png" height="80%" width="80%" alt="8"/>
-<br />
-<br />
-9. Remove the default inbound rule by clicking the 3 dots, then Remove <br/>
-  <img src="https://imgur.com/qwnq1Vt.png" height="80%" width="80%" alt="9"/>
-<br />
-<br />
-10. Click Add an inbound rule to allow everything into the VM, for our testing purposes <br/>
-11. In the Destination port ranges delete the port and add a star (*) the start signifies all ports, change the priority to 100 and click Add, then click Ok <br/>
-  <img src="https://imgur.com/YmKtco9.png" height="80%" width="80%" alt="10"/>
-<br />
-<br />
-12. Click Review + Create, then create <br/>
-
-<br/>
-<h3> Create a log analytics workspace </h3>
-<h4> To ingest logs from the virtual machine, the SIEM will connect to the workspace to display geo data of attacks on the map. </h4>
-<br/>
-1. Search for and go to Log Analytics workspaces <br/>
-  <img src="https://imgur.com/BkNx2He.png" height="80%" width="80%" alt="11"/>
-<br />
-<br />
-2. Click create log analytics workspace <br/>
-  <img src="https://imgur.com/zOcxldV.png" height="80%" width="80%" alt="12"/>
-<br />
-<br />
-3. Select the resource group created <br/>
-  <img src="https://imgur.com/Ex7Ds0F.png" height="80%" width="80%" alt="13"/>
-<br />
-<br />
-4. Choose a name and a region, then click Review + Create > Create <br/>
-  <img src="https://imgur.com/YUzUuOF.png" height="80%" width="80%" alt="14"/>
-<br />
-<br />
-
-<br/> 
-<h3> Enable gathering VM Logs in the Security center </h3>
-1. Search for and go to Microsoft defender for cloud <br/>
-  <img src="https://imgur.com/rsc4rrp.png" height="80%" width="80%" alt="15"/>
-<br />
-<br />
-2. Scroll down to management and click Environment settings <br/>
-  <img src="https://imgur.com/wK0Ys0Y.png" height="80%" width="80%" alt="16"/>
-<br />
-<br />
-3. Unfold the Azure subscription and click on the workspace we have created <br/>
-  <img src="https://imgur.com/YvQzibV.png" height="80%" width="80%" alt="17"/>
-<br />
-<br />
-4. Turn on Foundational CSPM and Servers, then click Save <br/>
-  <img src="https://imgur.com/WdFvvlB.png" height="80%" width="80%" alt="18"/>
-<br />
-<br />
-5. Click on the Data collection tab, and select All Events, and click Save <br/>
-  <img src="https://imgur.com/I5kE2w5.png" height="80%" width="80%" alt="19"/>
-<br />
-<br />
- <img src="https://imgur.com/wInM5H7.png" height="80%" width="80%" alt="20"/>
-<br />
-<br />
-
-<br/>
-<h3> Connect log analytics workspace to the VM </h3>
-1. Go to the Log analytics workspaces <br/>
-2. Click on the workspace created <br/>
-3. Scroll down to Virtual Machines <br/>
-  <img src="https://imgur.com/E6JtuuX.png" height="80%" width="80%" alt="21"/>
-<br />
-<br />
-4. Click on the VM <br/>
-  <img src="https://imgur.com/eZN61jG.png" height="80%" width="80%" alt="22"/>
-<br />
-<br />
-5. Click Connect <br/>
-  <img src="https://imgur.com/SH2LWSk.png" height="80%" width="80%" alt="23"/>
-<br />
-<br />
-
-<br/>
-<h3> Setup Microsoft Sentinel </h3>
-1. Search for and go to Azure sentinel <br/>
-  <img src="https://imgur.com/zzc7RyF.png" height="80%" width="80%" alt="24"/>
-<br />
-<br />
-2. Click Create Microsoft Sentinel <br/>
-  <img src="https://imgur.com/DXY3K3w.png" height="80%" width="80%" alt="25"/>
-<br />
-<br />
-3. Pick the analytics workspace that we want to connect to, and click Add <br/>
-  <img src="https://imgur.com/FMCuDn5.png" height="80%" width="80%" alt="26"/>
-<br />
-<br />
-
-<br/>
-<h3> Log into VM with remote desktop </h3>
-1. Search for and go to Virtual machines <br/>
-2. Click on our virtual machine and copy the public address <br/>
-  <img src="https://imgur.com/ULgfjvq.png" height="80%" width="80%" alt="27"/>
-<br />
-<br />
-3. Open remote desktop connection on your PC <br/>
-  <img src="https://imgur.com/uD0qMqB.png" height="80%" width="80%" alt="28"/>
-<br />
-<br />
-4. Paste the public IP copied and click connect <br/>
-  <img src="https://imgur.com/OKPuuje.png" height="80%" width="80%" alt="29"/>
-<br />
-<br />
-5. Type in the username and password that where set when creating the VM <br/>
-6. Choose the privacy settings for your VM <br/>
-
-<br/>
-<h3> Observe Event Viewer logs in VM </h3>
-1. Inside the VM, search for and open Event viewer <br/>
-  <img src="https://imgur.com/S8nsQHb.png" height="80%" width="80%" alt="30"/>
-<br />
-<br />
-2. Open windows logs, then click on Security, to see security events on the VM <br/>
-  <img src="https://imgur.com/ZsCY4YZ.png" height="80%" width="80%" alt="31"/>
-<br />
-<br />
-3. Double click an event to see the details, such as username, IP and other information of the person trying to access the VM in case of audit failure <br/>
-
-<br/>
-<h3> Turn off windows firewall on the VM </h3>
-1. Inside the VM, search for wf.msc <br/>
-  <img src="https://imgur.com/1YOAbVi.png" height="80%" width="80%" alt="32"/>
-<br />
-<br />
-2. Click on windows defender firewall properties <br/>
-  <img src="https://imgur.com/bjWcBi6.png" height="80%" width="80%" alt="33"/>
-<br />
-<br />
-3. Turn off firewall state on all profiles, click Apply > Ok <br/>
-4. Open CMD on your PC and ping the IP of the VM to test <br/>
+ <h1>Audit results</h1>
+ <h3> Audit scope </h3>
+ 
+Botium Toys internal IT audit will assess the following:
+- •	Current user permissions set in the following systems: accounting, end point detection, firewalls, intrusion detection system, security information and event management (SIEM) tool.
+- •	Current implemented controls in the following systems: accounting, end point detection, firewalls, intrusion detection system, Security Information and Event Management (SIEM) tool.
+- •	Current procedures and protocols set for the following systems: accounting, end point detection, firewall, intrusion detection system, Security Information and Event Management (SIEM) tool.
+- •	Ensure current user permissions, controls, procedures, and protocols in place align with necessary compliance requirements.
+- •	Ensure current technology is accounted for. Both hardware and system access.
 
 
-<br/>
-<h3> Run the PowerShell script on the VM </h3>
-1. Copy PowerShell script <br/>
-2. Open PowerShell ISE on VM <br/>
-3. Click New Script <br/>
-  <img src="https://imgur.com/3KJjg0Z.png" height="80%" width="80%" alt="34"/>
-<br />
-<br />
-4. Paste the script inside PowerShell ISE <br/>
-5. Click Save, and save it on the desktop <br/>
-  <img src="https://imgur.com/F1blBYE.png" height="80%" width="80%" alt="35"/>
-<br />
-<br />
-6. Go to the website: ipgeolocation.io, sign up, and type in the given API key inside the code on PowerShell ISE, as seen below <br/>
-  <img src="https://imgur.com/4K4QUn0.png" height="80%" width="80%" alt="36"/>
-<br />
-<br />
-7. Run the script <br/>
 
-<h4> The script runs as a loop, and looks through the event viewer, and grabs all the events of people that failed to login, and gets their geo data using their IP address, and creates a new log file. To test it, we can fail a login and check the log file. </h4>
+<h3> Audit goals </h3>
+
+The goals for Botium Toys’ internal IT audit are:
+- •	To adhere to the National Institute of Standards and Technology Cybersecurity Framework (NIST CSF) 
+- •	Establish a better process for their systems to ensure they are compliant 
+- •	Fortify system controls
+- •	Implement the concept of least permissions when it comes to user credential management 
+- •	Establish their policies and procedures, which includes their playbooks 
+- •	Ensure they are meeting compliance requirements
 
 
-<h3> Create a custom log in Log Analytics Workspace to bring in our customer log </h3>
-1. Go to Log analytics workspaces in Azure <br/>
-2. Go to the workspace created and scroll down to legacy custom logs, then add a custom log <br/>
-  <img src="https://imgur.com/dGbeY9C.png" height="80%" width="80%" alt="37"/>
-<br />
-<br />
-3. Copy the logs inside the log file from our VM, then paste it into a notepad, and add it in the sample log on Azure (used to train log analytics on what to look for in the log file) <br/>
-  <img src="https://imgur.com/yubl0pX.png" height="80%" width="80%" alt="38"/>
-<br />
-<br />
-  <img src="https://imgur.com/X46iipa.png" height="80%" width="80%" alt="39"/>
-<br />
-<br />
-4. Click Next > Next > In the collection path, type in the path where the log file is present on the VM (So it knows where to collect logs from) <br/>
-  <img src="https://imgur.com/KQR6VMt.png" height="80%" width="80%" alt="40"/>
-<br />
-<br />
-5. Click Next <br/>
-6. In the Details section, name the custom log > Next <br/>
-  <img src="https://imgur.com/p4EfsyO.png" height="80%" width="80%" alt="41"/>
-<br />
-<br />
-7. Click Create <br/>
+<h3> Critical findings (must be addressed immediately)</h3>
 
-<h4> To run the log > Go to log analytics workspaces > click on the workspace > logs > Type in the name of the custom log > Click Run </h4>
+Lack of compliance with GDPR, PCI DSS, and Systems and Organization Controls, new policies required.
+
+Controls that should be implemented immediately:
+
+- •	Least Privilege: Preventative; reduces risk by making sure vendors and non-authorized staff only have access to the assets/data they need to do their jobs
+- •	Access control policies: Preventative; increase confidentiality and integrity of data
+- •	Account management policies: Preventative; reduce attack surface and limit overall impact from disgruntled/former employees
+- •	Intrusion Detection System (IDS): Detective; allows IT team to identify possible intrusions (e.g., anomalous traffic) quickly
+- •	Separation of duties: Preventative; ensure no one has so much access that they can abuse the system for personal gain
+- •	Locking cabinets (for network gear): Preventative; increase integrity by preventing unauthorized personnel/individuals from physically accessing/modifying network infrastructure gear
+- •	Locks: Preventative; physical and digital assets are more secure
+- •	Disaster recovery plans: Corrective; business continuity to ensure systems are able to run in the event of an incident/there is limited to no loss of productivity downtime/impact to system components, including: computer room environment (air conditioning, power supply, etc.); hardware (servers, employee equipment); connectivity (internal network, wireless); applications (email, electronic data); data and restoration
+- •	Password policies: Preventative; establish password strength rules to improve security/reduce likelihood of account compromise through brute force or dictionary attack - - techniques
+- •	Encryption: Deterrent; makes confidential information/data more secure (e.g., website payment transactions)
+- •	Backups: Corrective; supports ongoing productivity in the case of an event; aligns to the disaster recovery plan
+- •	Password management system: Corrective; password recovery, reset, lock out notifications
+- •	Antivirus (AV) software: Corrective; detect and quarantine known threats
 
 
-<h3> Create custom fields </h3>
-1. Run the custom log (To run the log > Go to log analytics workspaces > click on the workspace > logs > Type in the name of the custom log > Click Run) <br/>
-2. Right click a column in the results tab > Extract fields <br/>
-  <img src="https://imgur.com/m533PcP.png" height="80%" width="80%" alt="42"/>
-<br />
-<br />
-3. To extract the fields from the raw custom data highlight the fields and add a field title, and change the type, then click extract > verify the accuracy > Save extraction, example: <br/>
-  <img src="https://imgur.com/d3j37Yf.png" height="80%" width="80%" alt="43"/>
-<br />
-<br />
-  <img src="https://imgur.com/PCHLd3r.png" height="80%" width="80%" alt="44"/>
-<br />
-<br />
-4. Do the same for all fields <br/>
+<h3>Findings (should be addressed, but no immediate need)</h3>
 
-<h4> In case the highlighted search results are wrong, click the pen (edit button) on the search result > Modify this highlight > highlight the correct number and click Extract > fix all search results > Save extraction </h4>
-5. To show the new fields in the results tab after running the query Click Columns and toggle the new fields <br/>
-  <img src="https://imgur.com/U0Jb5FQ.png" height="80%" width="80%" alt="45"/>
-<br />
-<br />
-6. If the fields are breaking after logging data, go to Legacy custom logs > Custom fields > delete the custom field > redo the custom fields the same way they where done the first time with more records <br/>
+Controls that should be implemented:
 
-<br/>
-<h3> Setup map in sentinel with latitude and longitude </h3>
-1. Search for and go to Microsoft Sentinel <br/>
-2. Click on the sentinel we setup earlier <br/>
-3. Click on Workbooks and add a workbook <br/>
-  <img src="https://imgur.com/I8u5JXx.png" height="80%" width="80%" alt="46"/>
-<br />
-<br />
-4. Click on Edit and remove the default widgets <br/>
-  <img src="https://imgur.com/xZvD3R7.png" height="80%" width="80%" alt="47"/>
-<br />
-<br />
-5. Add a query <br/>
-  <img src="https://imgur.com/ikYRPem.png" height="80%" width="80%" alt="48"/>
-<br />
-<br />
-6. Add a query for the map and run <br/>
-  <img src="https://imgur.com/MRQoFdG.png" height="80%" width="80%" alt="49"/>
-<br />
-<br />
-7. Set Visualization to Map <br/>
-  <img src="https://imgur.com/MsrZfOB.png" height="80%" width="80%" alt="50"/>
-<br />
-<br />
-8. Set the metric label to Label_CF, and the Metric Value to event_count <br/>
-9. We can plot the map by country, or by latitude and longitude in the Layout settings <br/>
-10. Click Apply > Save and close <br/>
-11. Save (and name) the new workbook <br/>
-  <img src="https://imgur.com/1v2J305.png" height="80%" width="80%" alt="51"/>
-<br />
-<br />
-12. Turn on auto refresh and set for 5 min > save<br/>
+- •	Manual monitoring, maintenance, and intervention: Preventative/corrective; required for legacy systems to identify and mitigate potential threats, risks, and vulnerabilities
+- •	Time-controlled safe: Deterrent; reduce attack surface/impact of physical threats
+- •	Adequate lighting: Deterrent; limit “hiding” places to deter threats
+- •	Closed-circuit television (CCTV) surveillance: Preventative/detective; can reduce risk of certain events; can be used after event for investigation
+- •	Signage indicating alarm service provider: Deterrent; makes the likelihood of a successful attack seem low
+- •	Fire detection and prevention (fire alarm, sprinkler system, etc.): Detective/Preventative; detect fire in the toy store’s physical location to prevent damage to inventory, servers, etc.
 
 
-<h4> Now we have access to a map that will show us any failed login attempt to the VM, by pulling data from the script that is running on the VM to Azure. Keep in mind the script in the VM has to be always running, this is a proof of concept implementation. See the result below: </h4>
- <img src="https://imgur.com/4yLH8SH.png" height="80%" width="80%" alt="52"/>
-<br />
-<br />
+<h3>Summary/Recommendations</h3>
 
-
+- To achieve the goals of Botium Toys, I would recommend the implementation of the controls listed in the critical findings, as soon as possible, to secure both digital and physical assets. Adherence with GDPR, PCI DSS, and System and Organization controls, by developing new policies, is a must.
+While not necessary immediately, the rest of the findings should be addressed to further improve Botium Toys’ security posture.
